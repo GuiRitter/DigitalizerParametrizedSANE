@@ -215,17 +215,25 @@ public class DigitalizerParametrizedSANE {
 		var right = leftRight.get(1);
 		var top = topBottom.get(0);
 		var bottom = topBottom.get(1);
+		var command = new Command(outputFile.getAbsolutePath(),
+			mode,
+			resolution,
+			left.toString(),
+			right.subtract(left).toString(),
+			top.toString(),
+			bottom.subtract(top).toString());
+		out.println(command.toString());
 		TERMINAL.execute(
-			"scanimage",
-			"--device-name=hpaio:/usb/Photosmart_D110_series?serial=BR0C1FK12Y05N9",
-			"--format=png",
-			"--output-file=" + outputFile.getAbsolutePath(),
-			"--mode", mode,
-			"--resolution", resolution + "dpi",
-			"-l", left + "mm",
-			"-x", right.subtract(left) + "mm",
-			"-t", top + "mm",
-			"-y", bottom.subtract(top) + "mm"
+			command.PROGRAM,
+			command.DEVICE,
+			command.FORMAT,
+			command.OUTPUT_KEY + command.OUTPUT_VALUE,
+			command.MODE_KEY, command.MODE_VALUE,
+			command.RESOLUTION_KEY, command.RESOLUTION_VALUE + command.RESOLUTION_UNIT,
+			command.LEFT_KEY, command.LEFT_VALUE + command.LEFT_UNIT,
+			command.WIDTH_KEY, command.WIDTH_VALUE + command.WIDTH_UNIT,
+			command.TOP_KEY, command.TOP_VALUE + command.TOP_UNIT,
+			command.HEIGHT_KEY, command.HEIGHT_VALUE + command.HEIGHT_UNIT
 		);
 	}
 
@@ -310,10 +318,12 @@ public class DigitalizerParametrizedSANE {
 
 	public static String xToString(double value) {
 		return doubleToString("1", value);
+		// return doubleToString("0", value);
 	}
 
 	public static String yToString(double value) {
 		return doubleToString("3", value);
+		// return doubleToString("0", value);
 	}
 
 	public static void main(String args[]) throws IOException {
@@ -361,7 +371,7 @@ public class DigitalizerParametrizedSANE {
 				(FileChooserResponse response) -> treatSelectedFile(response, file)
 		), buildGBCRight(y++, FULL_PADDING, HALF_PADDING));
 		
-		var outputFileNameFormatField = new JTextField("%d.png");
+		var outputFileNameFormatField = new JTextField("%z.png");
 		outputFileNameFormatField.setToolTipText("Use %z for an ISO 8601 timestamp at file creation time.");
 
 		frame.getContentPane().add(buildLabelledComponent(
